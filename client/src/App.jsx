@@ -1,8 +1,13 @@
- function App() {
+ import { Routes, Route } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
+import BoardPage from './pages/BoardPage'
+
+function App() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <h1 className="text-4xl font-bold">CollabBoard</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/board/:roomId" element={<BoardPage />} />
+    </Routes>
   )
 }
 
