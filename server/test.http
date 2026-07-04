@@ -1,0 +1,7 @@
+ POST http://localhost:5000/api/join-room
+Content-Type: application/json
+
+{
+  "roomId": "FAKEID99",
+  "userName": "Rahul"
+}

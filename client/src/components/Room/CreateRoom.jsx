@@ -6,26 +6,36 @@ function CreateRoom() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleCreateRoom = () => {
-    // Basic validation
-    if (!userName.trim()) {
-      alert('Please enter your name')
-      return
-    }
+  const handleCreateRoom = async () => {
+  if (!userName.trim()) {
+    alert('Please enter your name')
+    return
+  }
 
-    setLoading(true)
+  setLoading(true)
 
-    // Generate a random room ID for now
-    // On Day 3 this will call the backend API instead
-    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase()
+  try {
+    const response = await fetch('http://localhost:5000/api/create-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ownerName: userName })
+    })
 
-    // Small delay to simulate loading
-    setTimeout(() => {
-      navigate(`/board/${roomId}`, {
+    const data = await response.json()
+
+    if (data.success) {
+      navigate(`/board/${data.roomId}`, {
         state: { userName, isOwner: true }
       })
-    }, 500)
+    } else {
+      alert(data.message)
+    }
+  } catch (error) {
+    alert('Server error. Make sure backend is running.')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="flex-1 bg-gray-900 border border-gray-800 rounded-2xl p-6">

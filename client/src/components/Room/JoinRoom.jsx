@@ -7,24 +7,41 @@ function JoinRoom() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleJoinRoom = () => {
-    if (!userName.trim()) {
-      alert('Please enter your name')
-      return
-    }
-    if (!roomId.trim()) {
-      alert('Please enter a Room ID')
-      return
-    }
+   const handleJoinRoom = async () => {
+  if (!userName.trim()) {
+    alert('Please enter your name')
+    return
+  }
+  if (!roomId.trim()) {
+    alert('Please enter a Room ID')
+    return
+  }
 
-    setLoading(true)
+  setLoading(true)
 
-    setTimeout(() => {
-      navigate(`/board/${roomId.toUpperCase()}`, {
+  try {
+    const response = await fetch('http://localhost:5000/api/join-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomId, userName })
+    })
+
+    const data = await response.json()
+
+    if (data.success) {
+      navigate(`/board/${data.roomId}`, {
         state: { userName, isOwner: false }
       })
-    }, 500)
+    } else {
+      alert(data.message)
+    }
+  } catch (error) {
+    alert('Server error. Make sure backend is running.')
+  } finally {
+    setLoading(false)
   }
+}
+
 
   return (
     <div className="flex-1 bg-gray-900 border border-gray-800 rounded-2xl p-6">
