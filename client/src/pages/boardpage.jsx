@@ -1,5 +1,8 @@
  import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useSocket } from '../hooks/useSocket'
+import { useCanvas } from '../hooks/useCanvas'
+import Canvas from '../components/Canvas/Canvas'
+import Toolbar from '../components/Canvas/Toolbar'
 import UsersList from '../components/Room/UsersList'
 
 function BoardPage() {
@@ -10,37 +13,66 @@ function BoardPage() {
   const userName = location.state?.userName || 'Guest'
   const isOwner = location.state?.isOwner || false
 
-  // Connect to socket and join room
   const { onlineUsers } = useSocket(roomId, userName)
 
+  const {
+    canvasRef,
+    tool, setTool,
+    color, setColor,
+    brushSize, setBrushSize,
+    startDrawing,
+    draw,
+    stopDrawing
+  } = useCanvas()
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="h-screen bg-gray-900 flex flex-col overflow-hidden">
 
-      {/* Main Board Area */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-1">Room: {roomId}</h2>
-          <p className="text-gray-400 mb-1">Welcome, {userName}</p>
-          <p className="text-gray-600 text-sm">
-            {isOwner ? 'You created this room' : 'You joined this room'}
-          </p>
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+        <div className="flex items-center gap-3">
+          <span className="text-white font-semibold">CollabBoard</span>
+          <span className="text-gray-500 text-sm">Room: {roomId}</span>
         </div>
-
-        <div className="bg-gray-800 border border-gray-700 rounded-xl px-6 py-4 text-center">
-          <p className="text-gray-400 text-sm">Canvas loads here on Day 5</p>
+        <div className="flex items-center gap-3">
+          <span className="text-gray-400 text-sm">Hi, {userName}</span>
+          <button
+            onClick={() => navigate('/')}
+            className="text-gray-400 hover:text-white text-sm transition"
+          >
+            Leave
+          </button>
         </div>
-
-        <button
-          onClick={() => navigate('/')}
-          className="text-gray-500 hover:text-gray-300 text-sm transition"
-        >
-          ← Back to Home
-        </button>
       </div>
 
-      {/* Users Panel on Right Side */}
-      <div className="p-4">
-        <UsersList users={onlineUsers} />
+      {/* Toolbar */}
+      <Toolbar
+        tool={tool}
+        setTool={setTool}
+        color={color}
+        setColor={setColor}
+        brushSize={brushSize}
+        setBrushSize={setBrushSize}
+      />
+
+      {/* Main Area */}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* Canvas */}
+        <div className="flex-1 overflow-hidden">
+          <Canvas
+            canvasRef={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+          />
+        </div>
+
+        {/* Users Panel */}
+        <div className="p-3 bg-gray-800 border-l border-gray-700">
+          <UsersList users={onlineUsers} />
+        </div>
+
       </div>
 
     </div>
